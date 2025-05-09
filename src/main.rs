@@ -89,7 +89,7 @@ fn wait_for_window_to_show_up(app_name: &String, pid: u32) -> String {
     }
 }
 
-fn is_window_closed(app_name: &String, pid: u32) -> bool {
+fn is_window_closed(app_name: &String, pid: u32, state: &mut State) -> bool {
     let output =
     Command::new("wmctrl")
     .arg("-lp")
@@ -102,6 +102,7 @@ fn is_window_closed(app_name: &String, pid: u32) -> bool {
             return false;
         }
         println!("{}'s window is closed..", app_name);
+        turn_on_screen_blanking(state);
         println!("Shutting down..");    
         return true;
     }
@@ -281,7 +282,7 @@ fn main() {
 
     let window_id = wait_for_window_to_show_up(app_name, pid);
 
-    while !is_window_closed(app_name, pid) {
+    while !is_window_closed(app_name, pid, &mut state) {
         if track_audio {
             we_are_tracking_audio(app_name, &mut state);
         } else if track_fullscreen {
